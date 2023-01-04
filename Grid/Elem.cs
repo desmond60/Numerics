@@ -3,8 +3,7 @@ namespace Numerics.Grid;
 // % ***** Structure Final Element ***** % //
 public struct Elem<T> where T : System.Numerics.INumber<T>
 {
-
-    public Node<T>[] Nodes { get; set; }  /// Nodes of a finite element
+    public Node<T>[]  Nodes { get; set; }  /// Nodes of a finite element
     public Edge<T>[]? Edges { get; set; }  /// Edges of a finite element
 
     //: Constructor

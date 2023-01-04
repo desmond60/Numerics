@@ -1,8 +1,8 @@
 namespace Numerics.Grid;
 
 // % ***** Structure Edge ***** % //
-public struct Edge<T> where T : System.Numerics.INumber<T>  {
-
+public struct Edge<T> where T : System.Numerics.INumber<T>
+{
     public Node<T> NodeBegin { get; set; }  /// The begin node of the edge  
     public Node<T> NodeEnd   { get; set; }  /// The end node of the edge
 
