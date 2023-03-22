@@ -22,12 +22,15 @@ public class SquareMatrix<T> : ICloneable
     }
 
     //: Constructor (with double array)
-    public SquareMatrix(T[,] _mat) {        
+    public SquareMatrix(T[,] _mat) {
+
+        if (_mat.GetUpperBound(0) + 1 != _mat.GetUpperBound(1) + 1) throw new InvalidOperationException();
+
         int dim = _mat.GetUpperBound(0) + 1;
         matrix = new T[dim, dim];
         for (int i = 0; i < dim; i++)
             for (int j = 0; j < dim; j++)
-                matrix[i, j] = _mat[i, j];           
+                matrix[i, j] = _mat[i, j];
     }
 
     //: Indexer
@@ -183,5 +186,181 @@ public class SquareMatrix<T> : ICloneable
     public Matrix<T>  ToMatrix() => new Matrix<T>(matrix);
 
     // % ***** Interaction with other classes ***** % //
-    
+    //: Overloading multiplication by a Vector<T>
+    public static Vector<T> operator *(SquareMatrix<T> mat, Vector<T> vec) {
+
+        if (vec.Length != mat.Dim) throw new InvalidOperationException();
+
+        var result = new Vector<T>(vec.Length); 
+        for (int i = 0; i < mat.Dim; i++)
+            for (int j = 0; j < mat.Dim; j++)
+                result[i] += mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexVector
+    public static ComplexVector operator *(SquareMatrix<T> mat, ComplexVector vec) {
+
+        if (vec.Length != mat.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexVector(vec.Length); 
+        for (int i = 0; i < mat.Dim; i++)
+            for (int j = 0; j < mat.Dim; j++)
+                result[i] += (dynamic)mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a Matrix
+    public static Matrix<T> operator *(SquareMatrix<T> mat1, Matrix<T> mat2) {
+        
+        if (mat1.Dim != mat2.Rows) throw new InvalidOperationException();
+
+        var result = new Matrix<T>(mat1.Dim, mat2.Columns);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat2.Columns; j++)
+                for (int k = 0; k < mat1.Dim; k++)
+                    result[i,j] += mat1[i, k] * mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexMatrix
+    public static ComplexMatrix operator *(SquareMatrix<T> mat1, ComplexMatrix mat2) {
+        
+        if (mat1.Dim != mat2.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Dim, mat2.Columns);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat2.Columns; j++)
+                for (int k = 0; k < mat1.Dim; k++)
+                    result[i,j] += mat1[i, k] * (dynamic)mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexMatrix
+    public static ComplexMatrix operator *(ComplexMatrix mat1, SquareMatrix<T> mat2) {
+        
+        if (mat1.Columns != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat2.Dim);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                for (int k = 0; k < mat2.Dim; k++)
+                    result[i,j] += (dynamic)mat1[i, k] * mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareComplexMatrix
+    public static SquareComplexMatrix operator *(SquareMatrix<T> mat1, SquareComplexMatrix mat2) {
+        
+        if (mat1.Dim != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                for (int k = 0; k < mat1.Dim; k++)
+                    result[i,j] += mat1[i, k] * (dynamic)mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareComplexMatrix
+    public static SquareComplexMatrix operator *(SquareComplexMatrix mat1, SquareMatrix<T> mat2) {
+        
+        if (mat1.Dim != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                for (int k = 0; k < mat1.Dim; k++)
+                    result[i,j] += mat1[i, k] * (dynamic)mat2[k, j];
+        return result;
+    }
+
+    //: Overloading addition by a Matrix
+    public static SquareMatrix<T> operator +(SquareMatrix<T> mat1, Matrix<T> mat2) => mat2 + mat1;
+
+    //: Overloading addition by a ComplexMatrix
+    public static ComplexMatrix operator +(SquareMatrix<T>  mat1, ComplexMatrix mat2) {
+
+        if (mat1.Dim != mat2.Rows || mat2.Columns != mat1.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Dim, mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                    result[i,j] = mat1[i, j] + (dynamic)mat2[i, j];
+        return result;
+    }
+    public static ComplexMatrix operator +(ComplexMatrix mat1, SquareMatrix<T> mat2) => mat2 + mat1;
+
+    //: Overloading addition by a SquareComplexMatrix
+    public static SquareComplexMatrix operator +(SquareMatrix<T>  mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Dim != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] + (dynamic)mat2[i, j];
+        return result;
+    }
+    public static SquareComplexMatrix operator +(SquareComplexMatrix mat1, SquareMatrix<T> mat2) => mat2 + mat1;
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareMatrix<T> operator -(SquareMatrix<T> mat1, Matrix<T> mat2) {
+
+        if (mat1.Dim != mat2.Rows || mat2.Columns != mat1.Dim) throw new InvalidOperationException();
+
+        var result = new SquareMatrix<T>(mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                    result[i,j] = mat1[i, j] - mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a ComplexMatrix
+    public static SquareComplexMatrix operator -(SquareMatrix<T> mat1, ComplexMatrix mat2) {
+
+        if (mat1.Dim != mat2.Columns || mat2.Rows != mat1.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a ComplexMatrix
+    public static SquareComplexMatrix operator -(ComplexMatrix mat1, SquareMatrix<T> mat2) {
+
+        if (mat1.Rows != mat2.Dim || mat2.Dim != mat1.Columns) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareComplexMatrix operator -(SquareMatrix<T> mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Dim != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareComplexMatrix operator -(SquareComplexMatrix mat1, SquareMatrix<T> mat2) {
+
+        if (mat1.Dim != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
 }

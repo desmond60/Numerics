@@ -212,5 +212,52 @@ public class ComplexMatrix : ICloneable
     }
 
     // % ***** Interaction with other classes ***** % //
+    //: Overloading multiplication by a ComplexVector
+    public static ComplexVector operator *(ComplexMatrix mat, ComplexVector vec) {
 
+        if (vec.Length != mat.Columns) throw new InvalidOperationException();
+
+        var result = new ComplexVector(mat.Rows);
+        for (int i = 0; i < mat.Rows; i++)
+            for (int j = 0; j < mat.Columns; j++)
+                result[i] += (dynamic)mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareComplexMatrix
+    public static ComplexMatrix operator *(ComplexMatrix mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat2.Dim);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                for (int k = 0; k < mat2.Dim; k++)
+                    result[i,j] += mat1[i, k] * mat2[k, j];
+        return result;
+    }
+
+    //: Overloading addition by a SquareComplexMatrix
+    public static SquareComplexMatrix operator +(ComplexMatrix mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Dim || mat2.Dim != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] + mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareComplexMatrix operator -(ComplexMatrix mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Dim || mat2.Dim != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] - mat2[i, j];
+        return result;
+    }
 }

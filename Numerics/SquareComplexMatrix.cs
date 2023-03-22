@@ -22,6 +22,9 @@ public class SquareComplexMatrix : ICloneable
 
     //: Constructor (with double array)
     public SquareComplexMatrix(Complex[,] _mat) {        
+        
+        if (_mat.GetUpperBound(0) + 1 != _mat.GetUpperBound(1) + 1) throw new InvalidOperationException();
+
         int dim = _mat.GetUpperBound(0) + 1;
         matrix = new Complex[dim, dim];
         for (int i = 0; i < dim; i++)
@@ -191,5 +194,43 @@ public class SquareComplexMatrix : ICloneable
     public ComplexMatrix  ToComplexMatrix() => new ComplexMatrix(matrix);
     
     // % ***** Interaction with other classes ***** % //
-    
+    //: Overloading multiplication by a ComplexVector
+    public static ComplexVector operator *(SquareComplexMatrix mat, ComplexVector vec) {
+
+        if (vec.Length != mat.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexVector(vec.Length); 
+        for (int i = 0; i < mat.Dim; i++)
+            for (int j = 0; j < mat.Dim; j++)
+                result[i] += (dynamic)mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexMatrix
+    public static ComplexMatrix operator *(SquareComplexMatrix mat1, ComplexMatrix mat2) {
+
+        if (mat1.Dim != mat2.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Dim, mat2.Columns);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat2.Columns; j++)
+                for (int k = 0; k < mat1.Dim; k++)
+                    result[i,j] += mat1[i, k] * mat2[k, j];
+        return result;
+    }
+
+    //: Overloading addition by a ComplexMatrix
+    public static SquareComplexMatrix operator +(SquareComplexMatrix mat1, ComplexMatrix mat2) => mat2 + mat1;
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareComplexMatrix operator -(SquareComplexMatrix mat1, ComplexMatrix mat2) {
+
+        if (mat1.Dim != mat2.Rows || mat2.Columns != mat1.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                    result[i,j] = mat1[i, j] - mat2[i, j];
+        return result;
+    }
 }

@@ -187,5 +187,59 @@ public class Vector<T> : ICloneable, IEnumerable
     }
 
     // % ***** Interaction with other classes ***** % //
+    //: Overloading multiplication by a ComplexMatrix
+    public static ComplexVector operator *(ComplexMatrix mat, Vector<T> vec) {
 
+        if (vec.Length != mat.Columns) throw new InvalidOperationException();
+
+        var result = new ComplexVector(mat.Rows);
+        for (int i = 0; i < mat.Rows; i++)
+            for (int j = 0; j < mat.Columns; j++)
+                result[i] += (dynamic)mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareComplexMatrix
+    public static ComplexVector operator *(SquareComplexMatrix mat, Vector<T> vec) {
+
+        if (vec.Length != mat.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexVector(vec.Length); 
+        for (int i = 0; i < mat.Dim; i++)
+            for (int j = 0; j < mat.Dim; j++)
+                result[i] += (dynamic)mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexVector
+    public static Complex operator *(Vector<T> vec1, ComplexVector vec2) {
+        Complex result = new Complex();
+        for (int i = 0; i < vec1.Length; i++)
+            result += vec1[i] * (dynamic)vec2[i];
+        return result;
+    }
+    public static Complex operator *(ComplexVector vec1, Vector<T> vec2) => vec2 * vec1;
+
+    //: Overloading addition by a ComplexVector
+    public static ComplexVector operator +(Vector<T> vec1, ComplexVector vec2) {
+        var result = new ComplexVector(vec1.Length);
+        for (int i = 0; i < vec1.Length; i++)
+            result[i] = vec1[i] + (dynamic)vec2[i];
+        return result;
+    }
+    public static ComplexVector operator +(ComplexVector vec1, Vector<T> vec2) => vec2 + vec1;
+
+    //: Overloading subtraction by a ComplexVector
+    public static ComplexVector operator -(Vector<T> vec1, ComplexVector vec2) {
+        var result = new ComplexVector(vec1.Length);
+        for (int i = 0; i < vec1.Length; i++)
+            result[i] = vec1[i] - (dynamic)vec2[i];
+        return result;
+    }
+    public static ComplexVector operator -(ComplexVector vec1, Vector<T> vec2) {
+        var result = new ComplexVector(vec1.Length);
+        for (int i = 0; i < vec1.Length; i++)
+            result[i] = (dynamic)vec1[i] - vec2[i];
+        return result;
+    }
 }

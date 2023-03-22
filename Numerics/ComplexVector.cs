@@ -3,6 +3,7 @@ namespace Numerics;
 // % *****  Class ComplexVector ***** //
 public class ComplexVector : IEnumerable, ICloneable
 {
+    
     public Complex[] vector;            /// Vector
     public int Length => vector.Length; /// Length vector
 
@@ -205,7 +206,4 @@ public class ComplexVector : IEnumerable, ICloneable
     public static int LastIndexOf(ComplexVector vec, Complex val) {
         return Array.LastIndexOf((Complex[])vec, val);
     }
-
-    // % ***** Interaction with other classes ***** % //
-    
 }

@@ -205,5 +205,190 @@ public class Matrix<T> : ICloneable
     }
 
     // % ***** Interaction with other classes ***** % //
-    
+    //: Overloading multiplication by a Vector
+    public static Vector<T> operator *(Matrix<T> mat, Vector<T> vec) {
+        
+        if (vec.Length != mat.Columns) throw new InvalidOperationException();
+
+        var result = new Vector<T>(mat.Rows);
+        for (int i = 0; i < mat.Rows; i++)
+            for (int j = 0; j < mat.Columns; j++)
+                result[i] += mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexVector
+    public static ComplexVector operator *(Matrix<T> mat, ComplexVector vec) {
+        
+        if (vec.Length != mat.Columns) throw new InvalidOperationException();
+
+        var result = new ComplexVector(mat.Rows);
+        for (int i = 0; i < mat.Rows; i++)
+            for (int j = 0; j < mat.Columns; j++)
+                result[i] += (dynamic)mat[i,j] * vec[j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareMatrix
+    public static Matrix<T> operator *(Matrix<T> mat1, SquareMatrix<T> mat2) {
+        
+        if (mat1.Columns != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new Matrix<T>(mat1.Rows, mat2.Dim);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                for (int k = 0; k < mat2.Dim; k++)
+                    result[i,j] += mat1[i, k] * mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexMatrix
+    public static ComplexMatrix operator *(Matrix<T> mat1, ComplexMatrix mat2) {
+        
+        if (mat1.Columns != mat2.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat2.Columns);;
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat2.Columns; j++)
+                for (int k = 0; k < mat1.Columns; k++)
+                    result[i,j] += mat1[i, k] * (dynamic)mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a ComplexMatrix
+    public static ComplexMatrix operator *(ComplexMatrix mat1, Matrix<T> mat2) {
+        
+        if (mat1.Columns != mat2.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat2.Columns);;
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat2.Columns; j++)
+                for (int k = 0; k < mat1.Columns; k++)
+                    result[i,j] += mat1[i, k] * (dynamic)mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareComplexMatrix
+    public static ComplexMatrix operator *(Matrix<T> mat1, SquareComplexMatrix mat2) {
+        
+        if (mat1.Columns != mat2.Dim) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat2.Dim);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                for (int k = 0; k < mat2.Dim; k++)
+                    result[i,j] += mat1[i, k] * (dynamic)mat2[k, j];
+        return result;
+    }
+
+    //: Overloading multiplication by a SquareComplexMatrix
+    public static ComplexMatrix operator *(SquareComplexMatrix mat1, Matrix<T> mat2) {
+        
+        if (mat1.Dim != mat2.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Dim, mat2.Columns);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat2.Columns; j++)
+                for (int k = 0; k < mat1.Dim; k++)
+                    result[i,j] += (dynamic)mat1[i, k] * mat2[k, j];
+        return result;
+    }
+
+    //: Overloading addition by a SquareMatrix
+    public static SquareMatrix<T> operator +(Matrix<T> mat1, SquareMatrix<T> mat2) {
+
+        if (mat1.Columns != mat2.Dim || mat2.Dim != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new SquareMatrix<T>(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] + mat2[i, j];
+        return result;
+    }
+
+    //: Overloading addition by a ComplexMatrix
+    public static ComplexMatrix operator +(Matrix<T> mat1, ComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Columns || mat2.Rows != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat1.Columns);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat1.Columns; j++)
+                    result[i,j] = mat1[i, j] + (dynamic)mat2[i, j];
+        return result;
+    }
+    public static ComplexMatrix operator +(ComplexMatrix mat1, Matrix<T> mat2) => mat2 + mat1;
+
+    //: Overloading addition by a SquareComplexMatrix
+    public static SquareComplexMatrix operator +(Matrix<T> mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Dim || mat2.Dim != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] + (dynamic)mat2[i, j];
+        return result;
+    }
+    public static SquareComplexMatrix operator +(SquareComplexMatrix mat1, Matrix<T> mat2) => mat2 + mat1;
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareMatrix<T> operator -(Matrix<T> mat1, SquareMatrix<T> mat2) {
+
+        if (mat1.Columns != mat2.Dim || mat2.Dim != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new SquareMatrix<T>(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] - mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a ComplexMatrix
+    public static ComplexMatrix operator -(Matrix<T> mat1, ComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Columns || mat2.Rows != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat1.Columns);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat1.Columns; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a ComplexMatrix
+    public static ComplexMatrix operator -(ComplexMatrix mat1, Matrix<T> mat2) {
+
+        if (mat1.Columns != mat2.Columns || mat2.Rows != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new ComplexMatrix(mat1.Rows, mat1.Columns);
+        for (int i = 0; i < mat1.Rows; i++)
+            for (int j = 0; j < mat1.Columns; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareComplexMatrix operator -(Matrix<T> mat1, SquareComplexMatrix mat2) {
+
+        if (mat1.Columns != mat2.Dim || mat2.Dim != mat1.Rows) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat2.Dim);
+        for (int i = 0; i < mat2.Dim; i++)
+            for (int j = 0; j < mat2.Dim; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
+
+    //: Overloading subtraction by a SquareComplexMatrix
+    public static SquareComplexMatrix operator -(SquareComplexMatrix mat1, Matrix<T> mat2) {
+
+        if (mat1.Dim != mat2.Columns || mat2.Rows != mat1.Dim) throw new InvalidOperationException();
+
+        var result = new SquareComplexMatrix(mat1.Dim);
+        for (int i = 0; i < mat1.Dim; i++)
+            for (int j = 0; j < mat1.Dim; j++)
+                    result[i,j] = mat1[i, j] - (dynamic)mat2[i, j];
+        return result;
+    }
 }
